@@ -3,7 +3,6 @@ from django.db import models
 
 class ServerData(models.Model):
     server_id = models.BigIntegerField(primary_key=True)
-    prefix = models.CharField(max_length=1, default='~')
 
 
 class BaseCogData(models.Model):

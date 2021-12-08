@@ -4,6 +4,7 @@ import inspect
 
 import django
 import discord
+from discord.commands import slash_command
 from discord.ext import commands
 
 import bot_settings
@@ -11,32 +12,9 @@ import bot_settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dj_settings')
 django.setup()
 
+intents = discord.Intents.default()
 
-async def determine_prefix(in_bot: commands.Bot, ctx: commands.Context) -> str:
-    if ctx.guild is None:
-        return "~"
-    else:
-        from persistence import get_or_create_server_data
-        server_data = await get_or_create_server_data(ctx.guild.id)
-        return server_data.prefix
-
-
-bot = commands.Bot(command_prefix=determine_prefix)
-
-
-@bot.event
-async def on_ready():
-    print("--Bot Started--")
-    activity = discord.Game(name='~help', type=3)
-    await bot.change_presence(status=discord.Status.online, activity=activity)
-
-
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(f"Invalid command, use {await bot.command_prefix(bot, ctx)}help for help")
-    else:
-        raise error
+bot = commands.Bot(command_prefix="~", intents=intents)
 
 for module_path in bot_settings.AVAILABLE_COGS.keys():
     cogs = bot_settings.AVAILABLE_COGS[module_path]

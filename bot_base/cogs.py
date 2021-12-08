@@ -1,5 +1,7 @@
+from discord.commands import slash_command
 from discord.ext import commands
 
+from bot_settings import DEBUG_GUILDS
 from .exceptions import ImproperlyConfiguredCogError, NoCogDataError
 from .models import BaseCogData
 import persistence
@@ -47,26 +49,6 @@ class BaseBot(commands.Cog, name="Basic Commands"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="blip", description="Responds with 'blop'", brief="Test the bot")
+    @slash_command(name="blip", description="Responds with 'blop'", guild_ids=DEBUG_GUILDS)
     async def blip(self, ctx):
-        await ctx.send("blop")
-
-    @commands.command(name="set-prefix", description="Set the prefix of this server", brief="Change the prefix")
-    async def set_prefix(self, ctx: commands.Context, *, prefix: str):
-        if ctx.guild is None:
-            await ctx.send('You can only use that command in a server')
-        else:
-            if len(prefix) != 1:
-                await ctx.send('Prefix must be one character')
-            else:
-                server_data = await persistence.get_or_create_server_data(ctx.guild.id)
-                server_data.prefix = prefix
-                await persistence.save_server_data(server_data)
-                await ctx.send(f'Prefix is now: \"{prefix}\"')
-
-    @set_prefix.error
-    async def _prefix_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send("Please enter a prefix")
-        else:
-            raise error
+        await ctx.respond("blop")

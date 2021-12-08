@@ -25,19 +25,19 @@ class BaseCog(commands.Cog):
     async def save_data(self, data):
         await persistence.save_cog_data(data)
 
-    async def cog_check(self, ctx: commands.Context):
+    async def cog_check(self, ctx):
         if ctx.guild is None:
-            await ctx.send("This command can only be used in a server")
+            await ctx.respond("This command can only be used in a server")
             return False
         else:
             data = await self.load_data(ctx.guild.id)
             if data.enabled:
                 return True
             else:
-                await ctx.send("This command is disabled")
+                await ctx.respond("This command is disabled")
                 return False
 
-    async def cog_command_error(self, ctx: commands.Context, error):
+    async def cog_command_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
             pass
         else:

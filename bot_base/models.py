@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ServerData(models.Model):
-    server_id = models.BigIntegerField(primary_key=True)
+    server_id = models.IntegerField(primary_key=True)
 
 
 class BaseCogData(models.Model):

@@ -13,6 +13,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dj_settings')
 django.setup()
 
 intents = discord.Intents.default()
+intents.members = True
 
 bot = commands.Bot(command_prefix="~", intents=intents)
 

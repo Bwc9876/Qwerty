@@ -1,4 +1,5 @@
 from asgiref.sync import sync_to_async as _
+from django.db.models import QuerySet
 
 from bot_base.models import ServerData
 
@@ -18,3 +19,7 @@ async def get_or_create_cog_data(cog_model_class, server_id: int):
 
 async def save_cog_data(cog_data):
     await _(cog_data.save)()
+
+
+def queryset_to_list(queryset: QuerySet):
+    return list(queryset)

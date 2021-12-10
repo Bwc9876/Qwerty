@@ -12,7 +12,7 @@ def generate_allowed():
     import math
     import sympy
     import statistics
-    i_expression_allowed_words = get_funcs(math) + get_funcs(statistics)
+    i_expression_allowed_words = [x[0] for x in inspect.getmembers(math) if type(x[1]) == type(math.sin)] + get_funcs(statistics)
     i_equation_allowed_words = get_funcs(sympy)
     return i_expression_allowed_words, i_equation_allowed_words
 

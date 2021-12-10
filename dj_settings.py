@@ -5,6 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent
 INSTALLED_APPS = (
     'bot_base',
     'moderation',
+    'mathematics'
 )
 
 DATABASES = {

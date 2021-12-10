@@ -9,7 +9,7 @@ from persistence import _, queryset_to_list
 from .models import ModerationCogData, ModWarning
 
 
-class ModerationCog(BaseCog):
+class ModerationCog(BaseCog, name="Moderation"):
     cog_data_model = ModerationCogData
 
     COMMAND_PERMS = (
@@ -23,14 +23,14 @@ class ModerationCog(BaseCog):
             if ctx.interaction.user.guild_permissions.administrator or data.moderator_role_id is not None and (ctx.interaction.user.get_role(data.moderator_role_id) is not None or ctx.interaction.user.get_role(data.administrator_role_id) is not None):
                 return True
             else:
-                await ctx.respond("You lack permissions to perform this command")
+                await ctx.respond("You lack permissions to perform this command", ephemeral=True)
                 return False
         elif cmd_name in self.COMMAND_PERMS[1]:
             if data.administrator_role_id is not None and ctx.interaction.user.get_role(
                     data.administrator_role_id) is not None:
                 return True
             else:
-                await ctx.respond("You lack permissions to perform this command")
+                await ctx.respond("You lack permissions to perform this command", ephemeral=True)
                 return False
         else:
             return True

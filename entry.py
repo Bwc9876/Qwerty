@@ -4,7 +4,6 @@ import inspect
 
 import django
 import discord
-from discord.commands import slash_command
 from discord.ext import commands
 
 import bot_settings
@@ -15,7 +14,16 @@ django.setup()
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix="~", intents=intents)
+bot = commands.Bot(intents=intents)
+
+if bot_settings.DEBUG:
+    print("Debugging Is On With The Following Guilds:")
+    print('\n'.join([f"- {str(guild_id)}" for guild_id in bot_settings.DEBUG_GUILDS]))
+
+@bot.event
+async def on_ready():
+    print("Bot Online With The Following Cogs:")
+    print('\n'.join([f'- {str(cog)}' for cog in bot.cogs]))
 
 for module_path in bot_settings.AVAILABLE_COGS.keys():
     cogs = bot_settings.AVAILABLE_COGS[module_path]

@@ -36,14 +36,14 @@ class BaseCog(commands.Cog):
 
     async def cog_check(self, ctx):
         if ctx.guild is None:
-            await ctx.respond("This command can only be used in a server")
+            await ctx.respond("This command can only be used in a server", ephemeral=True)
             return False
         else:
             data = await self.load_data(ctx.guild.id)
             if data.enabled:
                 return await self.cog_data_check(ctx, data)
             else:
-                await ctx.respond("This command is disabled")
+                await ctx.respond("This command is disabled", ephemeral=True)
                 return False
 
     async def cog_command_error(self, ctx, error):
@@ -53,7 +53,7 @@ class BaseCog(commands.Cog):
             raise error
 
 
-class BaseBot(commands.Cog, name="Basic Commands"):
+class BaseBot(commands.Cog, name="Base Bot"):
 
     def __init__(self, bot):
         self.bot = bot

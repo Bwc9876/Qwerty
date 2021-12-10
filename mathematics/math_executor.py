@@ -1,6 +1,23 @@
 import string
+import inspect
 
 from sympy.core.mul import Mul
+
+
+def get_funcs(module):
+    return [str(x[0]) for x in inspect.getmembers(module, inspect.isfunction) if '_' not in x[0]]
+
+
+def generate_allowed():
+    import math
+    import sympy
+    import statistics
+    i_expression_allowed_words = get_funcs(math) + get_funcs(statistics)
+    i_equation_allowed_words = get_funcs(sympy)
+    return i_expression_allowed_words, i_equation_allowed_words
+
+
+expression_allowed_words, equation_allowed_words = generate_allowed()
 
 
 class MathRunError(Exception):

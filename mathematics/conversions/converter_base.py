@@ -10,6 +10,19 @@ class BaseConverter:
             cls.convert = super(BaseConverter, cls).__new__(cls)
         return cls.convert
 
+    def sanitize_value(self, value, unit):
+        return float(value)
+
+    def check(self, unit, value):
+        return self.can_process(unit) and self.valid_value_for_unit(unit, value)
+
+    def valid_value_for_unit(self, unit, value):
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
     def can_process(self, unit):
         raise NotImplementedError(f"{self.__class__.__name__} Has Not Declared can_process")
 
@@ -64,6 +77,34 @@ class CrossConvert:
             return False
 
 
+class LambdaConverter(BaseConverter):
+
+    base_func = None
+
+    functions = {
+
+    }
+
+    def get_func(self, unit):
+        for key, value in self.functions.items():
+            if unit in key:
+                return value
+        return None
+
+    def can_process(self, unit):
+        return unit in self.BASE_UNIT or self.get_func(unit) is not None
+
+    def from_base(self, value, unit):
+        value = self.sanitize_value(value, unit)
+        func = self.get_func(unit)
+        return func(value)
+
+    def to_base(self, value, unit):
+        value = self.sanitize_value(value, self.BASE_UNIT[0])
+        return self.base_func(value)
+
+
+
 class FactorConverter(BaseConverter):
 
     conflicts = [
@@ -90,9 +131,11 @@ class FactorConverter(BaseConverter):
         return False
 
     def to_base(self, value: float, unit: str) -> float:
+        value = self.sanitize_value(value, unit)
         return value * self.get_factor_value(unit)
 
     def from_base(self, value: float, unit: str) -> float:
+        value = self.sanitize_value(value, unit)
         return value / self.get_factor_value(unit)
 
 

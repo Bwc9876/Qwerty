@@ -33,7 +33,7 @@ class BaseConverter:
         raise NotImplementedError(f"{self.__class__.__name__} Has Not Declared from_base")
 
     def unit_str(self, unit):
-        return unit
+        return str(unit)
 
 
 class CrossConvert:
@@ -104,7 +104,6 @@ class LambdaConverter(BaseConverter):
         return self.base_func(value)
 
 
-
 class FactorConverter(BaseConverter):
 
     conflicts = [
@@ -166,7 +165,7 @@ class MetricConverter(FactorConverter):
         elif self.base_short is None:
             raise ValueError(f"base_short in {self.__class__.__name__} is None!")
         else:
-            self.BASE_UNIT = (self.base_name, self.base_short)
+            self.BASE_UNIT = (self.base_name, self.base_short, self.base_name + 's')
             for names, factor in metric_factors.items():
                 if names[1] == "m":
                     self.conflicts.append(names[1] + self.base_short)
@@ -174,6 +173,7 @@ class MetricConverter(FactorConverter):
                 for index, name in enumerate(names):
                     if index == 0:
                         name_list.append(name + self.base_name)
+                        name_list.append(name + self.base_name + 's')
                     else:
                         name_list.append(name + self.base_short)
                 self.factor_names.append(name_list)

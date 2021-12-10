@@ -26,7 +26,7 @@ class StringConverter(LambdaConverter):
         ('altering',): lambda x:    ''.join([c.lower() if i % 2 == 0 else c.upper() for i, c in enumerate(x)]),
         ('codes', 'code'): lambda x:   '|'.join([str(ord(c)) for c in x]),
         ('letters', 'letter'): lambda x: ''.join([c for c in x if c in string.ascii_letters]),
-        ('numbers', 'numbers', '#'): lambda x: ''.join([c for c in x if c in string.digits]),
+        ('numbers', 'number', '#'): lambda x: ''.join([c for c in x if c in string.digits]),
         ('special', 'specials'): lambda x: ''.join([c for c in x if c not in string.ascii_letters + string.digits])
     }
 
@@ -54,10 +54,13 @@ class WattConverter(MetricConverter):
 
 class ByteConverter(MetricConverter):
     base_name = "byte"
-    base_short = "B"
+    base_short = "b"
 
     def unit_str(self, unit):
-        return unit.upper()
+        if len(unit) == 2:
+            return unit.upper()
+        else:
+            return unit
 
 # Factor Converters
 
@@ -79,8 +82,8 @@ class ImperialAreaConverter(FactorConverter):
 class ImperialVolumeConverter(FactorConverter):
     BASE_UNIT = ('pint', 'pt')
 
-    factor_names = [('fluid ounce', 'fl oz'), ('quart', 'qt'), ('gallon', 'gal')]
-    factor_values = [1 / 20, 2, 8]
+    factor_names = [('teaspoon', 'tsp'), ('tablespoon', 'tbsp'), ('fluid ounce', 'fl oz'), ('quart', 'qt'), ('gallon', 'gal')]
+    factor_values = [1 / 96, 1 / 32,  1 / 20, 2, 8]
 
 
 class ImperialMassConverter(FactorConverter):

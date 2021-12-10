@@ -32,7 +32,7 @@ class MathCog(BaseCog, name="Math"):
         except MemoryEntry.DoesNotExist:
             await ctx.respond(f"There is nothing stored in slot {slot}")
 
-    async def get_memory(self, data: MathCogData) -> list[MemoryEntry]:
+    async def get_memory(self, data: MathCogData) -> dict:
         memories: list[MemoryEntry] = await _(queryset_to_list)(await _(data.mem.all)())
         return {m.index: float(m.value) for m in memories}
 

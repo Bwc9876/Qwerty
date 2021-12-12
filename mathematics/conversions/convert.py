@@ -25,8 +25,10 @@ def get_all_units_for_value(value: str):
 def get_all_units_for_from_unit(from_unit: str, value: str):
     converter = find_converter_by_unit(from_unit, value)
     crosses = find_available_cross_converters(converter)
-    return converter.convert.get_all_units_for_value(value) + [
-        cross_converter.convert.get_other_system(converter).convert.get_all_units() for cross_converter in crosses]
+    cross_units = []
+    for cross_converter in crosses:
+        cross_units += cross_converter.convert.get_other_system(converter).convert.get_all_units()
+    return converter.convert.get_all_units_for_value(value) + cross_units
 
 
 def convert_within_system(system, from_unit, to_unit, value):

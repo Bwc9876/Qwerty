@@ -1,24 +1,7 @@
 import string
-import inspect
+from re import findall
 
 from sympy.core.mul import Mul
-
-
-def get_funcs(module):
-    return [str(x[0]) for x in inspect.getmembers(module, inspect.isfunction) if '_' not in x[0]]
-
-
-def generate_allowed():
-    import math
-    import sympy
-    import statistics
-    base_allowed_words = get_funcs(__builtins__)
-    i_expression_allowed_words = [x[0] for x in inspect.getmembers(math) if isinstance(x[1],type(math.sin))] + get_funcs(statistics)
-    i_equation_allowed_words = get_funcs(sympy)
-    return i_expression_allowed_words + base_allowed_words, i_equation_allowed_words + base_allowed_words
-
-
-expression_allowed_words, equation_allowed_words = generate_allowed()
 
 
 class MathRunError(Exception):
@@ -61,15 +44,35 @@ convert_characters = {
     '⅐': "(1/7)",
     '⅑': "(1/9)",
     '⅒': "(1/10)",
+    'inf': "float('inf')",
     '∞': "float('inf')",
     'π': "pi"
 }
 
-base_allowed = string.ascii_letters + string.digits + ''.join(convert_characters.keys()) + "+-/*[]() "
+base_allowed = string.ascii_letters + string.digits + ''.join(convert_characters.keys()) + "+-/*[](). "
 
 ex_allowed_characters = base_allowed + "%<>=,"
 
 eq_allowed_characters = base_allowed + "=,"
+
+base_banned_words = ('import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None')
+
+
+def validate_input(input_str, allowed_characters, banned_words, char_check=None):
+    for index, char in enumerate(input_str):
+        if char in allowed_characters:
+            if char_check is not None:
+                char_check(index, char, input_str)
+        else:
+            raise MathRunError(f"Invalid Character: \"{char}\"")
+
+    for word in findall(r'[A-Za-z_]+', input_str):
+        if word in banned_words:
+            raise MathRunError(f"Name: \"{word}\" Not Allowed In Expression")
+
+
+def sanitize_input(input_str):
+    return ''.join([convert_characters.get(char, char) for char in input_str])
 
 
 def calc_expression(expression, memory):
@@ -102,38 +105,40 @@ def calc_equation(left_side, right_side, memory, var_name):
     except KeyError as error:
         raise MathRunError(f"No Value In Memory Slot: {error.args[0]}")
     except Exception as error:
-        raise MathRunError(f"Error in Expression: {str(error)}")
+        raise MathRunError(f"Error in Equation: {str(error)}")
+
+
+def ex_char_check(index, char, input_str):
+    try:
+        if char == "=" and not (input_str[index - 1] == "=" or input_str[index + 1] == "="):
+            raise MathRunError("Invalid Character \"=\"")
+    except IndexError:
+        raise MathRunError("Invalid Character \"=\"")
+
+
+async def ex_validate(raw_expression):
+    validate_input(raw_expression, ex_allowed_characters, base_banned_words, char_check=ex_char_check)
 
 
 async def solve_expression(raw_expression, memory):
-    expression = ""
-    for index, character in enumerate(raw_expression):
-        if character in ex_allowed_characters:
-            try:
-                if character == "=" and not (raw_expression[index - 1] == "=" or raw_expression[index + 1] == "="):
-                    raise MathRunError("Invalid Character \"=\"")
-            except IndexError:
-                raise MathRunError("Invalid Character \"=\"")
-            expression += convert_characters.get(character, character)
-        else:
-            raise MathRunError(f"Invalid Character: \"{character}\"")
+    expression = sanitize_input(raw_expression)
     return calc_expression(expression, memory)
 
 
-async def solve_equation(raw_expression, memory, var_name):
+async def eq_validate(raw_expression, var_name):
     if len(var_name) != 1:
         raise MathRunError("Variable Name Must Be One Character")
-    expression = ""
     eq_count = len([char for char in raw_expression if char == "="])
     if eq_count == 0:
         raise MathRunError("Must Have An Equal Sign")
     elif eq_count > 1:
         raise MathRunError("Can't Have More Than One Equal Sign")
-    for index, character in enumerate(raw_expression):
-        if character in eq_allowed_characters:
-            expression += convert_characters.get(character, character)
-        else:
-            raise MathRunError(f"Invalid Character: \"{character}\"")
+    else:
+        validate_input(raw_expression, eq_allowed_characters, base_banned_words)
+
+
+async def solve_equation(raw_expression, memory, var_name):
+    expression = sanitize_input(raw_expression)
     split_equation = expression.split("=")
     return calc_equation(split_equation[0], split_equation[1], memory, var_name)
 

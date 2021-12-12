@@ -1,9 +1,28 @@
 import string
 
-from .converter_base import MetricConverter, FactorConverter, CrossConvert, BaseConverter, LambdaConverter
+from mathematics.conversions.converter_base import FactorConverter, CrossConvert, BaseConverter, LambdaConverter, metric_factory
 
 
 # Lambda Converters
+
+
+class TemperatureConverter(LambdaConverter):
+
+    BASE_UNIT = ('fahrenheit', 'f', 'f°', '°f')
+
+    C_UNITS = ('celcius', 'c', 'c°', '°c')
+    K_UNITS = ('kelvin', 'k')
+
+    def base_func(self, value, unit):
+        if unit in self.K_UNITS:
+            return (value * (9/5)) - 459.67
+        else:
+            return (value * (9/5)) + 32
+
+    functions = {
+        C_UNITS: lambda x:  (x - 32) / (9/5),
+        K_UNITS: lambda x:  (x + 459.67) / (9/5)
+    }
 
 
 class StringConverter(LambdaConverter):
@@ -36,31 +55,24 @@ class StringConverter(LambdaConverter):
 
 # Metric Converters
 
-
-class MeterConverter(MetricConverter):
-    base_name = "meter"
-    base_short = "m"
-
-
-class GramConverter(MetricConverter):
-    base_name = "gram"
-    base_short = "g"
+MeterConverter = metric_factory(("meter", "m", "meters"))
+GramConverter = metric_factory(("gram", "g", "grams"))
+WattConverter = metric_factory(("watt", "w", "watts"))
+ByteConverter = metric_factory(("byte", "b", "bytes"))
 
 
-class WattConverter(MetricConverter):
-    base_name = "watt"
-    base_short = "W"
+def byte_unit_str(byte_converter, unit):
+    if len(unit) == 2:
+        return unit.upper()
+    else:
+        return unit
 
 
-class ByteConverter(MetricConverter):
-    base_name = "byte"
-    base_short = "b"
-
-    def unit_str(self, unit):
-        if len(unit) == 2:
-            return unit.upper()
-        else:
-            return unit
+ByteConverter.unit_str = byte_unit_str
+ByteConverter.factor_names = ByteConverter.factor_names[:4] + [("petabyte", "pb")]
+ByteConverter.factor_values = ByteConverter.factor_values[:4] + [10**15]
+ByteConverter.factor_names[2][1] = "mb"
+ByteConverter.conflicts = ()
 
 # Factor Converters
 
@@ -82,8 +94,8 @@ class ImperialAreaConverter(FactorConverter):
 class ImperialVolumeConverter(FactorConverter):
     BASE_UNIT = ('pint', 'pt')
 
-    factor_names = [('teaspoon', 'tsp'), ('tablespoon', 'tbsp'), ('fluid ounce', 'fl oz'), ('quart', 'qt'), ('gallon', 'gal')]
-    factor_values = [1 / 96, 1 / 32,  1 / 20, 2, 8]
+    factor_names = [('teaspoon', 'tsp'), ('tablespoon', 'tbsp'), ('fluid ounce', 'fl oz'), ('cup', 'cups'), ('quart', 'qt'), ('gallon', 'gal')]
+    factor_values = [1 / 96, 1 / 32,  1 / 20, 1 / 2, 2, 8]
 
 
 class ImperialMassConverter(FactorConverter):
@@ -108,6 +120,7 @@ class DollarsConverter(FactorConverter):
     BASE_UNIT = ('cents', '₵', '𝇍', '¢')
 
     factor_names = [('dollars', 'us dollars', '$')]
+    factor_values = [0.01]
 
 
 # Other Converters
@@ -191,6 +204,9 @@ class NumberSystemConverter(BaseConverter):
             output_number += self.over_10_digits.get(new_char, str(new_char))
             inter_value //= target_base
         return ''.join(reversed(output_number))
+
+    def get_all_units(self):
+        return [unit[0] for unit in self.bases.keys()] + [self.BASE_UNIT[0]]
 
 
 # Cross Converters

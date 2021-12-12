@@ -9,7 +9,7 @@ from persistence import _, queryset_to_list
 from .models import ModerationCogData, ModWarning
 
 
-class ModerationCog(BaseCog, name="Moderation"):
+class Moderation(BaseCog, name="Moderation"):
     cog_data_model = ModerationCogData
 
     COMMAND_PERMS = (

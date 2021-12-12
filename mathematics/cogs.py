@@ -1,14 +1,29 @@
-from discord.commands import slash_command, ApplicationContext, Option
+from discord import File
+from discord.commands import slash_command, ApplicationContext, Option, AutocompleteContext
+from discord.utils import basic_autocomplete
 from sympy.core.mul import Mul
 
 from bot_base.cogs import BaseCog
 from bot_settings import DEBUG_GUILDS
 from .models import MathCogData, MemoryEntry
 from persistence import _, queryset_to_list
-from .math_executor import solve_expression, solve_equation, MathRunError
+from .math_executor import solve_expression, solve_equation, ex_validate, eq_validate, MathRunError
+from .conversions.convert import convert, ConverterError, get_all_units_for_value, get_all_units_for_from_unit
+from .graphing.graph_executor import graph, validate_formula, GraphError
 
 
-class MathCog(BaseCog, name="Math"):
+async def from_unit_autocomplete(ctx: AutocompleteContext):
+    value = ctx.options.get('value', "")
+    return get_all_units_for_value(value)
+
+
+async def to_unit_autocomplete(ctx: AutocompleteContext):
+    value = ctx.options.get('value', "")
+    from_unit = ctx.options.get('from_unit', "")
+    return get_all_units_for_from_unit(from_unit, value)
+
+
+class Math(BaseCog, name="Math"):
 
     cog_data_model = MathCogData
 
@@ -51,10 +66,11 @@ class MathCog(BaseCog, name="Math"):
         data: MathCogData = await self.load_data(ctx.interaction.guild.id)
         mem = await self.get_memory(data)
         try:
+            await ex_validate(expression)
+            await ctx.defer()
             answer = await self.format_answer(await solve_expression(expression.strip(), mem))
             beginning = expression + " = "
             await ctx.respond(beginning + answer)
-
         except MathRunError as error:
             await ctx.respond(error.args[0], ephemeral=True)
 
@@ -63,8 +79,9 @@ class MathCog(BaseCog, name="Math"):
                     variable_name: Option(str, description="The name of the variable to solve for", required=False, default='x')):
         data: MathCogData = await self.load_data(ctx.interaction.guild.id)
         mem = await self.get_memory(data)
-        await ctx.defer()
         try:
+            await eq_validate(equation, variable_name)
+            await ctx.defer()
             answers = await solve_equation(equation, mem, variable_name)
             answer_count = len(answers)
             if answer_count == 0:
@@ -74,9 +91,31 @@ class MathCog(BaseCog, name="Math"):
             else:
                 answer_list = "{" + ', '.join([(await self.format_answer(answer)) for answer in answers]) + "}"
                 await ctx.respond(f"{variable_name} = {answer_list}")
-        except OverflowError:
-            await ctx.respond("Overflow Error")
         except MathRunError as error:
+            await ctx.respond(error.args[0], ephemeral=True)
+
+    @slash_command(name="convert", description="Convert from one unit to another", guild_ids=DEBUG_GUILDS)
+    async def convert(self, ctx: ApplicationContext, value: Option(str, description="The value to convert"),
+                      from_unit: Option(str, description="The unit to convert from", autocomplete=basic_autocomplete(from_unit_autocomplete)),
+                      to_unit: Option(str, description="The unit to convert to", autocomplete=basic_autocomplete(to_unit_autocomplete))):
+        try:
+            await ctx.respond(convert(value, from_unit, to_unit))
+        except ConverterError as error:
+            await ctx.respond(error.args[0], ephemeral=True)
+
+    @slash_command(name="graph", description="Graph a set of formulas", guild_ids=DEBUG_GUILDS)
+    async def graph(self, ctx: ApplicationContext, formulas: Option(str, description="The formula(s) to graph, seperated by pipes (|), do not include the f(x)= or y="),
+                    max_x: Option(int, description="The maximum value of x to graph, minimum is this *-1", required=False, default=10, min_value=1, max_value=1000),
+                    max_y: Option(int, description="The maximum value of y to graph, minimum is this *-1", required=False, default=10, min_value=1, max_value=1000)):
+        try:
+            validate_formula(formulas)
+            await ctx.defer()
+            graph_image = await graph(formulas, max_x, max_y)
+            graph_file = File(graph_image, filename="graph.png")
+            await ctx.send(file=graph_file)
+            graph_image.close()
+            await ctx.respond("Done")
+        except GraphError as error:
             await ctx.respond(error.args[0], ephemeral=True)
 
     @slash_command(name="math-help", description="Explains how to use the /calculate command", guild_ids=DEBUG_GUILDS)

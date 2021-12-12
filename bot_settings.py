@@ -14,6 +14,6 @@ else:
 
 AVAILABLE_COGS = {
     'bot_base.cogs': ('BaseBot',),
-    'moderation.cogs': ('ModerationCog',),
-    'mathematics.cogs': ('MathCog',)
+    'moderation.cogs': ('Moderation',),
+    'mathematics.cogs': ('Math',)
 }

@@ -32,6 +32,12 @@ class BaseConverter:
     def from_base(self, value, unit):
         raise NotImplementedError(f"{self.__class__.__name__} Has Not Declared from_base")
 
+    def get_all_units(self):
+        raise NotImplementedError(f"{self.__class__.__name__} Has Not Declared get_all")
+
+    def get_all_units_for_value(self, value: str):
+        return [unit for unit in self.convert.get_all_units() if self.convert.check(unit, value)]
+
     def unit_str(self, unit):
         return str(unit)
 
@@ -101,7 +107,10 @@ class LambdaConverter(BaseConverter):
 
     def to_base(self, value, unit):
         value = self.sanitize_value(value, self.BASE_UNIT[0])
-        return self.base_func(value)
+        return self.base_func(value, unit)
+
+    def get_all_units(self):
+        return [unit[0] for unit in self.functions.keys()] + [self.BASE_UNIT[0]]
 
 
 class FactorConverter(BaseConverter):
@@ -137,44 +146,34 @@ class FactorConverter(BaseConverter):
         value = self.sanitize_value(value, unit)
         return value / self.get_factor_value(unit)
 
+    def get_all_units(self):
+        return [unit[0] for unit in self.factor_names] + [self.BASE_UNIT[0]]
+
 
 metric_factors = {
-    ('tera', 't'): 10**12,
-    ('giga', 'g'): 10**9,
-    ('mega', 'M'): 10**6,
-    ('kilo', 'k'): 10**3,
-    ('hecto', 'h'): 10**2,
-    ('deca', 'da'): 10,
-    ('deci', 'd'): 10**-1,
-    ('centi', 'c'): 10**-2,
-    ('milli', 'm'): 10**-3,
-    ('micro', 'μ', 'u'): 10**-6,
-    ('nano', 'n'): 10**-9,
-    ('pico', 'p'): 10**-12
+    ('tera', 't'): 1/10**12,
+    ('giga', 'g'): 1/10**9,
+    ('mega', 'M'): 1/10**6,
+    ('kilo', 'k'): 1/10**3,
+    ('hecto', 'h'): 1/10**2,
+    ('deca', 'da'): 1/10,
+    ('deci', 'd'): 1/10-1,
+    ('centi', 'c'): 1/10**-2,
+    ('milli', 'm'): 1/10**-3,
+    ('micro', 'μ', 'u'): 1/10**-6,
+    ('nano', 'n'): 1/10**-9,
+    ('pico', 'p'): 1/10**-12
 }
 
 
-class MetricConverter(FactorConverter):
+def metric_factory(IN_BASE_UNIT):
 
-    base_name = None
-    base_short = None
+    class MetricConverter(FactorConverter):
 
-    def __init__(self):
-        if self.base_name is None:
-            raise ValueError(f"base_name in {self.__class__.__name__} is None!")
-        elif self.base_short is None:
-            raise ValueError(f"base_short in {self.__class__.__name__} is None!")
-        else:
-            self.BASE_UNIT = (self.base_name, self.base_short, self.base_name + 's')
-            for names, factor in metric_factors.items():
-                if names[1] == "m":
-                    self.conflicts.append(names[1] + self.base_short)
-                name_list = []
-                for index, name in enumerate(names):
-                    if index == 0:
-                        name_list.append(name + self.base_name)
-                        name_list.append(name + self.base_name + 's')
-                    else:
-                        name_list.append(name + self.base_short)
-                self.factor_names.append(name_list)
-                self.factor_values.append(factor)
+        BASE_UNIT = IN_BASE_UNIT
+        conflicts = (IN_BASE_UNIT[1] + 'm')
+
+        factor_names = [[prefix + (IN_BASE_UNIT[1] if index >= 1 else IN_BASE_UNIT[0]) for index, prefix in enumerate(names)] for names in metric_factors.keys()]
+        factor_values = list(metric_factors.values())
+
+    return MetricConverter

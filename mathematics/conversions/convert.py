@@ -1,16 +1,29 @@
 import inspect
 
-from . import converters
-from .converter_base import BaseConverter, CrossConvert, FactorConverter, MetricConverter, LambdaConverter
+from mathematics.conversions import converters
+from mathematics.conversions.converter_base import BaseConverter, CrossConvert, FactorConverter, LambdaConverter
 
 
 class ConverterError(Exception):
     pass
 
 
-BASE_CONVERTERS = (BaseConverter, CrossConvert, FactorConverter, MetricConverter, LambdaConverter)
+BASE_CONVERTERS = (BaseConverter, CrossConvert, FactorConverter, LambdaConverter)
 CONVERTERS = [cls[1] for cls in inspect.getmembers(converters, inspect.isclass) if issubclass(cls[1], BaseConverter) and (cls[1] not in BASE_CONVERTERS)]
 CROSS_CONVERTERS = [cls[1] for cls in inspect.getmembers(converters, inspect.isclass) if issubclass(cls[1], CrossConvert) and (cls[1] not in BASE_CONVERTERS)]
+
+
+def get_all_units_for_value(value: str):
+    units = []
+    for converter in CONVERTERS:
+        units += converter.convert.get_all_units_for_value(value)
+    return units
+
+
+def get_all_units_for_from_unit(from_unit: str, value: str):
+    converter = find_converter_by_unit(from_unit, value)
+    crosses = find_available_cross_converters(converter)
+    return converter.convert.get_all_units_for_value(value) + [cross_converter.convert.get_other_system(converter).convert.get_all_units() for cross_converter in crosses]
 
 
 def convert_within_system(system, from_unit, to_unit, value):
@@ -28,6 +41,14 @@ def find_converter_by_unit(unit, value):
         if converter.convert.check(unit, value):
             return converter
     return None
+
+
+def find_available_cross_converters(system):
+    available = []
+    for cross_converter in CROSS_CONVERTERS:
+        if cross_converter.convert.SYSTEM_1.convert == system.convert or cross_converter.convert.SYSTEM_2.convert == system.convert:
+            available.append(cross_converter)
+    return available
 
 
 def find_cross_converter_by_system_and_unit(system, to_unit):

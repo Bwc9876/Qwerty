@@ -48,7 +48,8 @@ try:
     @bot.event
     async def on_ready():
         print("", end="\r")
-        print(f"{ConsoleColors.color('✔', ConsoleColors.GREEN)} {bot.user.display_name} Online With The Following Cogs:")
+        print(
+            f"{ConsoleColors.color('✔', ConsoleColors.GREEN)} {bot.user.display_name} Online With The Following Cogs:")
         print('\n'.join([f'• {str(cog)}' for cog in bot.cogs]))
         print("Press ^C To Exit")
 
@@ -77,7 +78,7 @@ try:
         raise TypeError("The bot key cannot be None")
 except Exception as error:
     if bot_settings.DEBUG is False:
-        print(" "*100, end="\r")
+        print(" " * 100, end="\r")
         print(f"{ConsoleColors.color('✘', ConsoleColors.RED)} Error While Starting Bot: " + str(error), end="\r")
     else:
         raise error

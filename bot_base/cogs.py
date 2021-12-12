@@ -80,7 +80,9 @@ class BaseBot(commands.Cog, name="Base Bot"):
 
     @slash_command(name="enable-cog", description="Enable A Cog For This Server", guild_ids=DEBUG_GUILDS)
     @permissions.is_owner()
-    async def enable(self, ctx: ApplicationContext,  cog_name: Option(str, description="The name of the cog to enable", autocomplete=basic_autocomplete(cog_autocomplete))):
+    async def enable(self, ctx: ApplicationContext, cog_name: Option(str, description="The name of the cog to enable",
+                                                                     autocomplete=basic_autocomplete(
+                                                                         cog_autocomplete))):
         try:
             await self.enable_or_disable_cog(cog_name, ctx.interaction.guild.id, enabled=True)
             await ctx.respond("Cog Enabled", ephemeral=True)
@@ -89,10 +91,11 @@ class BaseBot(commands.Cog, name="Base Bot"):
 
     @slash_command(name="disable-cog", description="Disable A Cog For This Server", guild_ids=DEBUG_GUILDS)
     @permissions.is_owner()
-    async def disable(self, ctx: ApplicationContext,  cog_name: Option(str, description="The name of the cog to disable", autocomplete=basic_autocomplete(cog_autocomplete))):
+    async def disable(self, ctx: ApplicationContext, cog_name: Option(str, description="The name of the cog to disable",
+                                                                      autocomplete=basic_autocomplete(
+                                                                          cog_autocomplete))):
         try:
             await self.enable_or_disable_cog(cog_name, ctx.interaction.guild.id, enabled=False)
             await ctx.respond("Cog Disabled", ephemeral=True)
         except ValueError as error:
             await ctx.respond(error.args[0], ephemeral=True)
-

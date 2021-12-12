@@ -22,7 +22,7 @@ class Moderation(BaseCog, name="Moderation"):
         if cmd_name in self.COMMAND_PERMS[0]:
             if ctx.interaction.user.guild_permissions.administrator or data.moderator_role_id is not None and (
                     ctx.interaction.user.get_role(data.moderator_role_id) is not None or ctx.interaction.user.get_role(
-                    data.administrator_role_id) is not None):
+                data.administrator_role_id) is not None):
                 return True
             else:
                 await ctx.respond("You lack permissions to perform this command", ephemeral=True)
@@ -50,9 +50,11 @@ class Moderation(BaseCog, name="Moderation"):
             return False
         elif invoker.id == guild.owner_id:
             return True
-        elif (invoker.get_role(data.moderator_role_id) is not None) and (target.get_role(data.administrator_role_id) is not None):
+        elif (invoker.get_role(data.moderator_role_id) is not None) and (
+                target.get_role(data.administrator_role_id) is not None):
             return False
-        elif (invoker.get_role(data.moderator_role_id) is not None) and (target.get_role(data.moderator_role_id) is not None):
+        elif (invoker.get_role(data.moderator_role_id) is not None) and (
+                target.get_role(data.moderator_role_id) is not None):
             return False
         else:
             return True

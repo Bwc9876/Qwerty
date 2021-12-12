@@ -131,7 +131,7 @@ class NumberSystemConverter(BaseConverter):
 
     bases = {
         ('binary', 'base2', 'bin'): 2,
-        ('hexadecimal', 'base6' ,'hex'): 16,
+        ('hexadecimal', 'base6', 'hex'): 16,
         ('octal', 'base8', 'oct'): 8
     }
 
@@ -206,6 +206,9 @@ class NumberSystemConverter(BaseConverter):
 
     def get_all_units(self):
         return [unit[0] for unit in self.bases.keys()] + [self.BASE_UNIT[0]]
+
+    def unit_str(self, unit):
+        return f"in {unit}"
 
 
 # Cross Converters

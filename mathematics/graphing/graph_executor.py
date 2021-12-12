@@ -46,7 +46,8 @@ def process_formulas(formulas: list[str]):
 def graph_formulas(formulas: list[str], max_x: int, max_y: int, x_axis_label: str, y_axis_label: str, title: str):
     lambda_list = process_formulas(formulas)
     try:
-        grapher = Grapher(lambda_list, equations=formulas, max_x=max_x, max_y=max_y, x_axis_label=x_axis_label, y_axis_label=y_axis_label, title=title)
+        grapher = Grapher(lambda_list, equations=formulas, max_x=max_x, max_y=max_y, x_axis_label=x_axis_label,
+                          y_axis_label=y_axis_label, title=title)
         # grapher.show()
         return grapher.as_bytes()
     except Exception as error:

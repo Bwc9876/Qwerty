@@ -11,30 +11,18 @@ from .graphing.graph_executor import graph, validate_formula, GraphError
 from .math_executor import solve_expression, solve_equation, ex_validate, eq_validate, MathRunError
 from .models import MathCogData, MemoryEntry
 
-conversion_from_unit_cache = {}
-conversion_to_unit_cache = {}
-
 
 async def from_unit_autocomplete(ctx: AutocompleteContext):
     value = ctx.options.get('value', "")
-    if value in conversion_from_unit_cache.keys():
-        return conversion_from_unit_cache.get(value)
-    else:
-        out_units = get_all_units_for_value(value)
-        conversion_from_unit_cache[value] = out_units
-        return out_units
+    out_units = get_all_units_for_value(value)
+    return out_units
 
 
 async def to_unit_autocomplete(ctx: AutocompleteContext):
     value = ctx.options.get('value', "")
     from_unit = ctx.options.get('from_unit', "")
-    for key, value in conversion_to_unit_cache.items():
-        if key == (from_unit, value):
-            return value
-    else:
-        out_units = get_all_units_for_from_unit(from_unit, value)
-        conversion_to_unit_cache[(from_unit, value)] = out_units
-        return out_units
+    out_units = get_all_units_for_from_unit(from_unit, value)
+    return out_units
 
 
 class Math(BaseCog, name="Math"):

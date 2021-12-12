@@ -56,7 +56,7 @@ ex_allowed_characters = base_allowed + "%<>=,"
 eq_allowed_characters = base_allowed + "=,"
 
 base_banned_words = (
-'import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None')
+    'import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None')
 
 
 def validate_input(input_str, allowed_characters, banned_words, char_check=None):

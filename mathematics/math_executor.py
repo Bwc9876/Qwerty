@@ -81,7 +81,12 @@ def calc_expression(expression, memory):
     try:
         exec(f'from math import *\nfrom statistics import *\nanswer[0]={expression}',
              {"~builtins~": __builtins__}, {'answer': answer, 'm': memory})
-        float(answer[0])
+        try:
+            float(answer[0])
+        except OverflowError as error:
+            raise error
+        except Exception:
+            pass
         return answer[0]
     except OverflowError:
         raise MathRunError("Overflow Error")
@@ -112,7 +117,7 @@ def calc_equation(left_side, right_side, memory, var_name):
 
 def ex_char_check(index, char, input_str):
     try:
-        if char == "=" and not (input_str[index - 1] == "=" or input_str[index + 1] == "="):
+        if char == "=" and not (input_str[index - 1] in ("=", "<", ">") or input_str[index + 1] == "="):
             raise MathRunError("Invalid Character \"=\"")
     except IndexError:
         raise MathRunError("Invalid Character \"=\"")

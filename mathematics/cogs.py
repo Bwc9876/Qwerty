@@ -11,16 +11,30 @@ from .graphing.graph_executor import graph, validate_formula, GraphError
 from .math_executor import solve_expression, solve_equation, ex_validate, eq_validate, MathRunError
 from .models import MathCogData, MemoryEntry
 
+conversion_from_unit_cache = {}
+conversion_to_unit_cache = {}
+
 
 async def from_unit_autocomplete(ctx: AutocompleteContext):
     value = ctx.options.get('value', "")
-    return get_all_units_for_value(value)
+    if value in conversion_from_unit_cache.keys():
+        return conversion_from_unit_cache.get(value)
+    else:
+        out_units = get_all_units_for_value(value)
+        conversion_from_unit_cache[value] = out_units
+        return out_units
 
 
 async def to_unit_autocomplete(ctx: AutocompleteContext):
     value = ctx.options.get('value', "")
     from_unit = ctx.options.get('from_unit', "")
-    return get_all_units_for_from_unit(from_unit, value)
+    for key, value in conversion_to_unit_cache.items():
+        if key == (from_unit, value):
+            return value
+    else:
+        out_units = get_all_units_for_from_unit(from_unit, value)
+        conversion_to_unit_cache[(from_unit, value)] = out_units
+        return out_units
 
 
 class Math(BaseCog, name="Math"):
@@ -55,12 +69,18 @@ class Math(BaseCog, name="Math"):
     async def format_answer(self, answer):
         if isinstance(answer, Mul):
             return str(answer).replace("I", "i")
-        else:
+        elif isinstance(answer, type(None)):
+            return "Nothing"
+        elif isinstance(answer, bool):
+            return "True" if answer else "False"
+        elif isinstance(answer, float | int):
             possible = str(float(answer))
             if len(possible) > 2000:
                 return "Too Big For Discord"
             else:
                 return possible
+        else:
+            return str(answer)
 
     @slash_command(name="calculate", description="Evaluate a mathematical expression", guild_ids=DEBUG_GUILDS)
     async def calculate(self, ctx: ApplicationContext, *,
@@ -71,7 +91,8 @@ class Math(BaseCog, name="Math"):
             await ex_validate(expression)
             await ctx.defer()
             answer = await self.format_answer(await solve_expression(expression.strip(), mem))
-            beginning = expression + " = "
+            seperator = " is " if answer in ("True", "False", "Nothing") else " = "
+            beginning = expression + seperator
             await ctx.respond(beginning + answer)
         except MathRunError as error:
             await ctx.respond(error.args[0], ephemeral=True)
@@ -115,15 +136,17 @@ class Math(BaseCog, name="Math"):
                     max_x: Option(int, description="The maximum value of x to graph, minimum is this *-1",
                                   required=False, default=10, min_value=1, max_value=1000),
                     max_y: Option(int, description="The maximum value of y to graph, minimum is this *-1",
-                                  required=False, default=10, min_value=1, max_value=1000)):
+                                  required=False, default=10, min_value=1, max_value=1000),
+                    x_axis_label: Option(str, description="The label for the x-axis", required=False, default="x"),
+                    y_axis_label: Option(str, description="The label for the y-axis", required=False, default="ƒ(x)"),
+                    title: Option(str, description="The title for the graph", required=False, default="")):
         try:
             validate_formula(formulas)
             await ctx.defer()
-            graph_image = await graph(formulas, max_x, max_y)
+            graph_image = await graph(formulas, max_x, max_y, x_axis_label, y_axis_label, title)
             graph_file = File(graph_image, filename="graph.png")
-            await ctx.send(file=graph_file)
+            await ctx.respond(file=graph_file)
             graph_image.close()
-            await ctx.respond("Done")
         except GraphError as error:
             await ctx.respond(error.args[0], ephemeral=True)
 

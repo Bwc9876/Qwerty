@@ -45,6 +45,18 @@ class Moderation(BaseCog, name="Moderation"):
                 warnings.remove(warning)
         return warnings
 
+    async def check_supersedes(self, data: ModerationCogData, invoker: Member, target: Member, guild):
+        if target.id == guild.owner_id:
+            return False
+        elif invoker.id == guild.owner_id:
+            return True
+        elif (invoker.get_role(data.moderator_role_id) is not None) and (target.get_role(data.administrator_role_id) is not None):
+            return False
+        elif (invoker.get_role(data.moderator_role_id) is not None) and (target.get_role(data.moderator_role_id) is not None):
+            return False
+        else:
+            return True
+
     @slash_command(name="warnings", description="Get the warnings for yourself or another user", guild_ids=DEBUG_GUILDS)
     async def list_warnings(self, ctx: ApplicationContext,
                             user: Option(Member, "Pick a user to show the warnings for [Optional]", required=False,
@@ -66,15 +78,18 @@ class Moderation(BaseCog, name="Moderation"):
                    reason: Option(str, "Enter the reason for the warning [Optional]", required=False, default=None),
                    days: Option(int, "Enter the days the warning lasts for [Optional]", required=False, default=7)):
         data: ModerationCogData = await self.load_data(ctx.guild.id)
-        await _(ModWarning.objects.create)(parent_cog=data, user_id=user.id, reporter_id=ctx.interaction.user.id,
-                                           reason=reason, forget_time=timedelta(days=days))
-        warnings = await self.load_warnings(data, user.id)
-        if len(warnings) == data.max_warnings_until_ban:
-            await user.ban(reason="Exceeded Warning Limit")
-            await ctx.respond(f"{user.name} Has Been Banned For Exceeding {data.max_warnings_until_ban} Warnings")
+        if await self.check_supersedes(data, ctx.interaction.user, user, ctx.interaction.guild):
+            await _(ModWarning.objects.create)(parent_cog=data, user_id=user.id, reporter_id=ctx.interaction.user.id,
+                                               reason=reason, forget_time=timedelta(days=days))
+            warnings = await self.load_warnings(data, user.id)
+            if len(warnings) == data.max_warnings_until_ban:
+                await user.ban(reason="Exceeded Warning Limit")
+                await ctx.respond(f"{user.name} Has Been Banned For Exceeding {data.max_warnings_until_ban} Warnings")
+            else:
+                reason_str = "" if reason is None else f"For: {reason}"
+                await ctx.respond(f"{user.mention} You Have Received A Warning {reason_str}")
         else:
-            reason_str = "" if reason is None else f"For: {reason}"
-            await ctx.respond(f"{user.mention} You Have Received A Warning {reason_str}")
+            await ctx.respond("You lack rank to perform that command", ephemeral=True)
 
     @slash_command(name="forgive", description="Clear all warnings for a user", guild_ids=DEBUG_GUILDS)
     async def forgive(self, ctx: ApplicationContext, user: Option(Member, "The user to forgive")):
@@ -86,5 +101,9 @@ class Moderation(BaseCog, name="Moderation"):
     async def ban(self, ctx: ApplicationContext, user: Option(Member, "The user to ban"),
                   reason: Option(str, "The reason why this user has been banned [Optional]", required=False,
                                  default="No Reason Provided")):
-        await user.ban(reason=reason)
-        await ctx.respond(f"{user.name} Has Been Banned For: {reason}")
+        data: ModerationCogData = await self.load_data(ctx.interaction.guild.id)
+        if await self.check_supersedes(data, ctx.interaction.user, user, ctx.interaction.guild):
+            await user.ban(reason=reason)
+            await ctx.respond(f"{user.name} Has Been Banned For: {reason}")
+        else:
+            await ctx.respond("You lack rank to perform that command", ephemeral=True)

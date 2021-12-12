@@ -15,7 +15,7 @@ def validate_formula(raw_formula):
 
 def get_formula_lambda(formula: str):
     func = [None]
-    sp_import = "from sympy import sin, cos, tan, asin, acos, atan"
+    sp_import = "from sympy import sin, cos, tan, asin, acos, atan, floor, ceiling, pi"
     try:
         exec(f"def f(x):\n\t{sp_import}\n\treturn {formula}\nfunc[0]=f", {"~builtins~": __builtins__}, {'func': func})
         try:
@@ -43,22 +43,22 @@ def process_formulas(formulas: list[str]):
     return output_funcs
 
 
-def graph_formulas(formulas: list[str], max_x: int, max_y: int):
+def graph_formulas(formulas: list[str], max_x: int, max_y: int, x_axis_label: str, y_axis_label: str, title: str):
     lambda_list = process_formulas(formulas)
     try:
-        grapher = Grapher(lambda_list, equations=formulas, max_x=max_x, max_y=max_y)
+        grapher = Grapher(lambda_list, equations=formulas, max_x=max_x, max_y=max_y, x_axis_label=x_axis_label, y_axis_label=y_axis_label, title=title)
         # grapher.show()
         return grapher.as_bytes()
     except Exception as error:
         raise GraphError("Error while graphing: " + str(error))
 
 
-async def graph(raw_formulas: str, max_x: int, max_y: int):
+async def graph(raw_formulas: str, max_x: int, max_y: int, x_axis_label: str, y_axis_label: str, title: str):
     if max_x > 1000 or max_y > 1000:
         raise GraphError("Max_x and max_y must below 1000")
     formulas = raw_formulas.split("|")
     if len(formulas) > 5:
         raise GraphError("Can only render 5 formulas at a time")
     else:
-        out_image = graph_formulas(formulas, max_x, max_y)
+        out_image = graph_formulas(formulas, max_x, max_y, x_axis_label, y_axis_label, title)
         return out_image

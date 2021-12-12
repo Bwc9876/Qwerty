@@ -127,12 +127,12 @@ class DollarsConverter(FactorConverter):
 
 
 class NumberSystemConverter(BaseConverter):
-    BASE_UNIT = ('base10', 'dec', 'decimal')
+    BASE_UNIT = ('decimal', 'dec', 'base10')
 
     bases = {
-        ('base2', 'binary', 'bin'): 2,
-        ('base16', 'hexadecimal', 'hex'): 16,
-        ('base8', 'octal', 'oct'): 8
+        ('binary', 'base2', 'bin'): 2,
+        ('hexadecimal', 'base6' ,'hex'): 16,
+        ('octal', 'base8', 'oct'): 8
     }
 
     over_10_digits = {i + 10: x for i, x in enumerate(string.ascii_lowercase)}

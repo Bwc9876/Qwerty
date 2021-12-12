@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv(".env")
 
-DEBUG = os.getenv("DEBUG_STATE", "true").lower() == "true"
+DEBUG = os.getenv("DEBUG_STATE", "true").lower() != "false"
 KEY = os.getenv("BOT_KEY", None)
 
 if DEBUG:

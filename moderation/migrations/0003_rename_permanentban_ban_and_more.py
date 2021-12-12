@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('moderation', '0002_modwarning_reporter_id'),
     ]

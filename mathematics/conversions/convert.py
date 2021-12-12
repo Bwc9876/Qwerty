@@ -9,8 +9,10 @@ class ConverterError(Exception):
 
 
 BASE_CONVERTERS = (BaseConverter, CrossConvert, FactorConverter, LambdaConverter)
-CONVERTERS = [cls[1] for cls in inspect.getmembers(converters, inspect.isclass) if issubclass(cls[1], BaseConverter) and (cls[1] not in BASE_CONVERTERS)]
-CROSS_CONVERTERS = [cls[1] for cls in inspect.getmembers(converters, inspect.isclass) if issubclass(cls[1], CrossConvert) and (cls[1] not in BASE_CONVERTERS)]
+CONVERTERS = [cls[1] for cls in inspect.getmembers(converters, inspect.isclass) if
+              issubclass(cls[1], BaseConverter) and (cls[1] not in BASE_CONVERTERS)]
+CROSS_CONVERTERS = [cls[1] for cls in inspect.getmembers(converters, inspect.isclass) if
+                    issubclass(cls[1], CrossConvert) and (cls[1] not in BASE_CONVERTERS)]
 
 
 def get_all_units_for_value(value: str):
@@ -23,7 +25,8 @@ def get_all_units_for_value(value: str):
 def get_all_units_for_from_unit(from_unit: str, value: str):
     converter = find_converter_by_unit(from_unit, value)
     crosses = find_available_cross_converters(converter)
-    return converter.convert.get_all_units_for_value(value) + [cross_converter.convert.get_other_system(converter).convert.get_all_units() for cross_converter in crosses]
+    return converter.convert.get_all_units_for_value(value) + [
+        cross_converter.convert.get_other_system(converter).convert.get_all_units() for cross_converter in crosses]
 
 
 def convert_within_system(system, from_unit, to_unit, value):
@@ -53,7 +56,8 @@ def find_available_cross_converters(system):
 
 def find_cross_converter_by_system_and_unit(system, to_unit):
     for cross_converter in CROSS_CONVERTERS:
-        if cross_converter.convert.can_process(system.convert.BASE_UNIT[0]) and cross_converter.convert.can_process(to_unit):
+        if cross_converter.convert.can_process(system.convert.BASE_UNIT[0]) and cross_converter.convert.can_process(
+                to_unit):
             return cross_converter
     return None
 
@@ -71,10 +75,13 @@ def convert_logic(from_unit, to_unit, value):
         if cross_converter is None:
             raise ConverterError(f"Can't Convert From {from_unit} to {to_unit}")
         else:
-            inter_base = from_system.convert.sanitize_value(value, from_unit) if from_unit.lower() in from_system.convert.BASE_UNIT else from_system.convert.to_base(value, from_unit)
+            inter_base = from_system.convert.sanitize_value(value,
+                                                            from_unit) if from_unit.lower() in from_system.convert.BASE_UNIT else from_system.convert.to_base(
+                value, from_unit)
             to_system = cross_converter.convert.get_other_system(from_system)
             out_value = cross_converter.convert.cross_convert(inter_base, from_system.convert.BASE_UNIT[0])
-            return from_system, to_system, out_value if to_unit in to_system.convert.BASE_UNIT else to_system.convert.from_base(out_value, to_unit)
+            return from_system, to_system, out_value if to_unit in to_system.convert.BASE_UNIT else to_system.convert.from_base(
+                out_value, to_unit)
 
 
 def convert(value: str, from_unit: str, to_unit: str) -> str:

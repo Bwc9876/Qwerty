@@ -20,7 +20,9 @@ class Moderation(BaseCog, name="Moderation"):
     async def cog_data_check(self, ctx: ApplicationContext, data: ModerationCogData):
         cmd_name = ctx.command.qualified_name()
         if cmd_name in self.COMMAND_PERMS[0]:
-            if ctx.interaction.user.guild_permissions.administrator or data.moderator_role_id is not None and (ctx.interaction.user.get_role(data.moderator_role_id) is not None or ctx.interaction.user.get_role(data.administrator_role_id) is not None):
+            if ctx.interaction.user.guild_permissions.administrator or data.moderator_role_id is not None and (
+                    ctx.interaction.user.get_role(data.moderator_role_id) is not None or ctx.interaction.user.get_role(
+                    data.administrator_role_id) is not None):
                 return True
             else:
                 await ctx.respond("You lack permissions to perform this command", ephemeral=True)
@@ -45,7 +47,8 @@ class Moderation(BaseCog, name="Moderation"):
 
     @slash_command(name="warnings", description="Get the warnings for yourself or another user", guild_ids=DEBUG_GUILDS)
     async def list_warnings(self, ctx: ApplicationContext,
-                            user: Option(Member, "Pick a user to show the warnings for [Optional]", required=False, default=None)):
+                            user: Option(Member, "Pick a user to show the warnings for [Optional]", required=False,
+                                         default=None)):
         if user is None:
             user = ctx.interaction.user
         data = await self.load_data(ctx.guild.id)
@@ -63,7 +66,8 @@ class Moderation(BaseCog, name="Moderation"):
                    reason: Option(str, "Enter the reason for the warning [Optional]", required=False, default=None),
                    days: Option(int, "Enter the days the warning lasts for [Optional]", required=False, default=7)):
         data: ModerationCogData = await self.load_data(ctx.guild.id)
-        await _(ModWarning.objects.create)(parent_cog=data, user_id=user.id, reporter_id=ctx.interaction.user.id, reason=reason, forget_time=timedelta(days=days))
+        await _(ModWarning.objects.create)(parent_cog=data, user_id=user.id, reporter_id=ctx.interaction.user.id,
+                                           reason=reason, forget_time=timedelta(days=days))
         warnings = await self.load_warnings(data, user.id)
         if len(warnings) == data.max_warnings_until_ban:
             await user.ban(reason="Exceeded Warning Limit")
@@ -79,6 +83,8 @@ class Moderation(BaseCog, name="Moderation"):
         await ctx.respond("User Forgiven", ephemeral=True)
 
     @slash_command(name="ban", description="Ban A User", guild_ids=DEBUG_GUILDS)
-    async def ban(self, ctx: ApplicationContext, user: Option(Member, "The user to ban"), reason: Option(str, "The reason why this user has been banned [Optional]", required=False, default="No Reason Provided")):
+    async def ban(self, ctx: ApplicationContext, user: Option(Member, "The user to ban"),
+                  reason: Option(str, "The reason why this user has been banned [Optional]", required=False,
+                                 default="No Reason Provided")):
         await user.ban(reason=reason)
         await ctx.respond(f"{user.name} Has Been Banned For: {reason}")

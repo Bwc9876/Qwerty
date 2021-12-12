@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv(".env")
 
-DEBUG = True
+DEBUG = os.getenv("DEBUG_STATE", "true").lower() == "true"
 KEY = os.getenv("BOT_KEY", None)
 
 if DEBUG:
@@ -15,5 +15,5 @@ else:
 AVAILABLE_COGS = {
     'bot_base.cogs': ('BaseBot',),
     'moderation.cogs': ('Moderation',),
-    'mathematics.cogs': ('Math',)
+    'mathematics.cogs': ('Math',),
 }

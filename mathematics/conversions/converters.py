@@ -1,13 +1,13 @@
 import string
 
-from mathematics.conversions.converter_base import FactorConverter, CrossConvert, BaseConverter, LambdaConverter, metric_factory
+from mathematics.conversions.converter_base import FactorConverter, CrossConvert, BaseConverter, LambdaConverter, \
+    metric_factory
 
 
 # Lambda Converters
 
 
 class TemperatureConverter(LambdaConverter):
-
     BASE_UNIT = ('fahrenheit', 'f', 'f°', '°f')
 
     C_UNITS = ('celcius', 'c', 'c°', '°c')
@@ -15,13 +15,13 @@ class TemperatureConverter(LambdaConverter):
 
     def base_func(self, value, unit):
         if unit in self.K_UNITS:
-            return (value * (9/5)) - 459.67
+            return (value * (9 / 5)) - 459.67
         else:
-            return (value * (9/5)) + 32
+            return (value * (9 / 5)) + 32
 
     functions = {
-        C_UNITS: lambda x:  (x - 32) / (9/5),
-        K_UNITS: lambda x:  (x + 459.67) / (9/5)
+        C_UNITS: lambda x: (x - 32) / (9 / 5),
+        K_UNITS: lambda x: (x + 459.67) / (9 / 5)
     }
 
 
@@ -40,10 +40,10 @@ class StringConverter(LambdaConverter):
         return str(x)
 
     functions = {
-        ('upper', 'uppercase'): lambda x:   x.upper(),
-        ('lower', 'lowercase'): lambda x:   x.lower(),
-        ('altering',): lambda x:    ''.join([c.lower() if i % 2 == 0 else c.upper() for i, c in enumerate(x)]),
-        ('codes', 'code'): lambda x:   '|'.join([str(ord(c)) for c in x]),
+        ('upper', 'uppercase'): lambda x: x.upper(),
+        ('lower', 'lowercase'): lambda x: x.lower(),
+        ('altering',): lambda x: ''.join([c.lower() if i % 2 == 0 else c.upper() for i, c in enumerate(x)]),
+        ('codes', 'code'): lambda x: '|'.join([str(ord(c)) for c in x]),
         ('letters', 'letter'): lambda x: ''.join([c for c in x if c in string.ascii_letters]),
         ('numbers', 'number', '#'): lambda x: ''.join([c for c in x if c in string.digits]),
         ('special', 'specials'): lambda x: ''.join([c for c in x if c not in string.ascii_letters + string.digits])
@@ -70,9 +70,10 @@ def byte_unit_str(byte_converter, unit):
 
 ByteConverter.unit_str = byte_unit_str
 ByteConverter.factor_names = ByteConverter.factor_names[:4] + [("petabyte", "pb")]
-ByteConverter.factor_values = ByteConverter.factor_values[:4] + [10**15]
+ByteConverter.factor_values = ByteConverter.factor_values[:4] + [10 ** 15]
 ByteConverter.factor_names[2][1] = "mb"
 ByteConverter.conflicts = ()
+
 
 # Factor Converters
 
@@ -94,8 +95,9 @@ class ImperialAreaConverter(FactorConverter):
 class ImperialVolumeConverter(FactorConverter):
     BASE_UNIT = ('pint', 'pt')
 
-    factor_names = [('teaspoon', 'tsp'), ('tablespoon', 'tbsp'), ('fluid ounce', 'fl oz'), ('cup', 'cups'), ('quart', 'qt'), ('gallon', 'gal')]
-    factor_values = [1 / 96, 1 / 32,  1 / 20, 1 / 2, 2, 8]
+    factor_names = [('teaspoon', 'tsp'), ('tablespoon', 'tbsp'), ('fluid ounce', 'fl oz'), ('cup', 'cups'),
+                    ('quart', 'qt'), ('gallon', 'gal')]
+    factor_values = [1 / 96, 1 / 32, 1 / 20, 1 / 2, 2, 8]
 
 
 class ImperialMassConverter(FactorConverter):
@@ -106,17 +108,15 @@ class ImperialMassConverter(FactorConverter):
 
 
 class TimeConverter(FactorConverter):
-
     BASE_UNIT = ('second', 's', 'sec')
 
     factor_names = [('nanosecond', 'ns'), ('microsecond', 'μs', 'us'), ('millisecond', 'ms'), ('minute', 'min'),
                     ('hour', 'hr', 'h'), ('day', 'd'), ('week', 'w'), ('month', 'mon'), ('year', 'y'),
                     ('decade',), ('century', 'cen')]
-    factor_values = [10**-9, 10**-6, 10**-3, 60, 3600, 86400, 604800, 2592000, 31557600, 315576000, 3155760000]
+    factor_values = [10 ** -9, 10 ** -6, 10 ** -3, 60, 3600, 86400, 604800, 2592000, 31557600, 315576000, 3155760000]
 
 
 class DollarsConverter(FactorConverter):
-
     BASE_UNIT = ('cents', '₵', '𝇍', '¢')
 
     factor_names = [('dollars', 'us dollars', '$')]
@@ -127,7 +127,6 @@ class DollarsConverter(FactorConverter):
 
 
 class NumberSystemConverter(BaseConverter):
-
     BASE_UNIT = ('base10', 'dec', 'decimal')
 
     bases = {
@@ -173,7 +172,7 @@ class NumberSystemConverter(BaseConverter):
             if target_base <= 10:
                 return self.check_int(value)
             elif target_base < 36:
-                allowed = string.ascii_lowercase[:target_base-10]
+                allowed = string.ascii_lowercase[:target_base - 10]
                 for char in value:
                     if (char in string.ascii_lowercase) and (char not in allowed):
                         return False
@@ -191,7 +190,7 @@ class NumberSystemConverter(BaseConverter):
         value = self.sanitize_value(value, unit)
         unit = unit.lower()
         target_base = self.get_base_factor(unit)
-        return sum([self.convert_letter_to_number(x) * target_base**i for i, x in enumerate(reversed(value))])
+        return sum([self.convert_letter_to_number(x) * target_base ** i for i, x in enumerate(reversed(value))])
 
     def from_base(self, value, unit):
         value = self.sanitize_value(value, self.BASE_UNIT[0])
@@ -213,7 +212,6 @@ class NumberSystemConverter(BaseConverter):
 
 
 class ImperialMetricDistanceConverter(CrossConvert):
-
     SYSTEM_1 = ImperialDistanceConverter
     SYSTEM_2 = MeterConverter
 
@@ -221,7 +219,6 @@ class ImperialMetricDistanceConverter(CrossConvert):
 
 
 class ImperialMetricWeightConverter(CrossConvert):
-
     SYSTEM_1 = ImperialMassConverter
     SYSTEM_2 = GramConverter
 

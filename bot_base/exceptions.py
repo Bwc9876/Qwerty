@@ -1,5 +1,3 @@
-
-
 class SettingsInvalidError(ValueError):
     pass
 

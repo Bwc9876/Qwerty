@@ -55,7 +55,8 @@ ex_allowed_characters = base_allowed + "%<>=,"
 
 eq_allowed_characters = base_allowed + "=,"
 
-base_banned_words = ('import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None')
+base_banned_words = (
+'import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None')
 
 
 def validate_input(input_str, allowed_characters, banned_words, char_check=None):
@@ -94,8 +95,9 @@ def calc_equation(left_side, right_side, memory, var_name):
     solutions = [None]
     try:
         imports = "from sympy import *\n"
-        exec(f"{imports}{var_name} = symbols(\"{var_name}\")\nsolutions[0]=solve(({left_side})-({right_side}), {var_name})",
-             {"~builtins~": __builtins__}, {'solutions': solutions, 'm': memory})
+        exec(
+            f"{imports}{var_name} = symbols(\"{var_name}\")\nsolutions[0]=solve(({left_side})-({right_side}), {var_name})",
+            {"~builtins~": __builtins__}, {'solutions': solutions, 'm': memory})
         for answer in solutions[0]:
             if not isinstance(answer, Mul):
                 float(answer)
@@ -141,4 +143,3 @@ async def solve_equation(raw_expression, memory, var_name):
     expression = sanitize_input(raw_expression)
     split_equation = expression.split("=")
     return calc_equation(split_equation[0], split_equation[1], memory, var_name)
-

@@ -1,22 +1,21 @@
-from io import BytesIO
 from collections.abc import Callable
+from io import BytesIO
 from typing import Any
 
-from PIL import Image
 import matplotlib.font_manager as font_manager
-from matplotlib.pyplot import figure
-from matplotlib.figure import Figure
+from PIL import Image
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from matplotlib.pyplot import figure
 from matplotlib.ticker import MaxNLocator
-from sympy.plotting.plot import _matplotlib_list, Plot
 from sympy import plot_implicit, Eq
 from sympy.abc import x, y
+from sympy.plotting.plot import _matplotlib_list, Plot
 
 DEFAULT_FONT = font_manager.FontProperties(family="times new roman", style='normal', size=10)
 
 
 class Grapher:
-
     DEFAULT_OPTIONS = {
         'max_x': 10,
         'max_y': 10,
@@ -129,8 +128,7 @@ class Grapher:
         if self.rendered is False:
             self._render()
         out_bytes = BytesIO()
-        image = Image.frombytes('RGB', self.fig.canvas.get_width_height(),  self.fig.canvas.tostring_rgb())
+        image = Image.frombytes('RGB', self.fig.canvas.get_width_height(), self.fig.canvas.tostring_rgb())
         image.save(out_bytes, 'PNG')
         out_bytes.seek(0)
         return out_bytes
-

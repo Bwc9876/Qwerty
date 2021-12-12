@@ -6,7 +6,6 @@ class ServerData(models.Model):
 
 
 class BaseCogData(models.Model):
-
     CONCRETE = False
     ENABLED_BY_DEFAULT = True
 

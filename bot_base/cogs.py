@@ -1,15 +1,13 @@
-from discord.commands import slash_command, application_command, SlashCommand, CheckFailure
+from discord.commands import slash_command, CheckFailure
 from discord.ext import commands
 
-import bot_settings
+import persistence
 from bot_settings import DEBUG_GUILDS
 from .exceptions import ImproperlyConfiguredCogError, NoCogDataError
 from .models import BaseCogData
-import persistence
 
 
 class BaseCog(commands.Cog):
-
     cog_data_model = None
 
     def inject_checks(self):
@@ -18,7 +16,8 @@ class BaseCog(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         if self.cog_data_model is not None and issubclass(self.cog_data_model, BaseCogData) is False:
-            raise ImproperlyConfiguredCogError(f"cog_data_model must of of type 'BaseCogData', not '{type(self.cog_data_model)}'")
+            raise ImproperlyConfiguredCogError(
+                f"cog_data_model must of of type 'BaseCogData', not '{type(self.cog_data_model)}'")
         self.bot = bot
         self.inject_checks()
 

@@ -6,14 +6,12 @@ from bot_base.models import BaseCogData
 
 
 class ModerationCogData(BaseCogData):
-
     moderator_role_id = models.IntegerField(blank=True, null=True)
     administrator_role_id = models.IntegerField(blank=True, null=True)
     max_warnings_until_ban = models.IntegerField(default=3)
 
 
 class ModWarning(models.Model):
-
     parent_cog = models.ForeignKey(ModerationCogData, on_delete=models.CASCADE, related_name="warnings")
     user_id = models.IntegerField()
     reporter_id = models.IntegerField()

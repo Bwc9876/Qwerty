@@ -1,6 +1,4 @@
-
 class BaseConverter:
-
     BASE_UNIT = None
 
     convert = None
@@ -43,7 +41,6 @@ class BaseConverter:
 
 
 class CrossConvert:
-
     convert = None
 
     def __new__(cls):
@@ -84,7 +81,6 @@ class CrossConvert:
 
 
 class LambdaConverter(BaseConverter):
-
     base_func = None
 
     functions = {
@@ -114,7 +110,6 @@ class LambdaConverter(BaseConverter):
 
 
 class FactorConverter(BaseConverter):
-
     conflicts = [
 
     ]
@@ -151,29 +146,29 @@ class FactorConverter(BaseConverter):
 
 
 metric_factors = {
-    ('tera', 't'): 1/10**12,
-    ('giga', 'g'): 1/10**9,
-    ('mega', 'M'): 1/10**6,
-    ('kilo', 'k'): 1/10**3,
-    ('hecto', 'h'): 1/10**2,
-    ('deca', 'da'): 1/10,
-    ('deci', 'd'): 1/10-1,
-    ('centi', 'c'): 1/10**-2,
-    ('milli', 'm'): 1/10**-3,
-    ('micro', 'μ', 'u'): 1/10**-6,
-    ('nano', 'n'): 1/10**-9,
-    ('pico', 'p'): 1/10**-12
+    ('tera', 't'): 1 / 10 ** 12,
+    ('giga', 'g'): 1 / 10 ** 9,
+    ('mega', 'M'): 1 / 10 ** 6,
+    ('kilo', 'k'): 1 / 10 ** 3,
+    ('hecto', 'h'): 1 / 10 ** 2,
+    ('deca', 'da'): 1 / 10,
+    ('deci', 'd'): 1 / 10 - 1,
+    ('centi', 'c'): 1 / 10 ** -2,
+    ('milli', 'm'): 1 / 10 ** -3,
+    ('micro', 'μ', 'u'): 1 / 10 ** -6,
+    ('nano', 'n'): 1 / 10 ** -9,
+    ('pico', 'p'): 1 / 10 ** -12
 }
 
 
 def metric_factory(IN_BASE_UNIT):
-
     class MetricConverter(FactorConverter):
-
         BASE_UNIT = IN_BASE_UNIT
         conflicts = (IN_BASE_UNIT[1] + 'm')
 
-        factor_names = [[prefix + (IN_BASE_UNIT[1] if index >= 1 else IN_BASE_UNIT[0]) for index, prefix in enumerate(names)] for names in metric_factors.keys()]
+        factor_names = [
+            [prefix + (IN_BASE_UNIT[1] if index >= 1 else IN_BASE_UNIT[0]) for index, prefix in enumerate(names)] for
+            names in metric_factors.keys()]
         factor_values = list(metric_factors.values())
 
     return MetricConverter

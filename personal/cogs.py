@@ -2,7 +2,7 @@ import os
 from asyncio import create_subprocess_shell
 from subprocess import PIPE
 
-from discord.commands import slash_command, ApplicationContext, permissions, Option
+from discord.commands import slash_command, ApplicationContext, Option
 
 from bot_settings import OWNER, DEBUG_GUILDS
 from bot_base.cogs import BaseCog

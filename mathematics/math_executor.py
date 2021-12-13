@@ -86,7 +86,7 @@ def process_coefficients(source_str: str, var_name: str):
         as_list.insert(r.start() + parsed[r.start():r.end()].index('x') + 1, '*')
         parsed = ''.join(as_list)
         r = pattern.search(parsed, r.end())
-    pattern = re.compile(r'\)[0-9(x]')
+    pattern = re.compile(r'\)[0-9(]|\d\(')
     r = pattern.search(parsed)
     while r is not None:
         as_list = list(parsed)

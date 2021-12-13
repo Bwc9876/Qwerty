@@ -1,3 +1,6 @@
+import re
+import os
+import sys
 import string
 from re import findall
 
@@ -56,7 +59,7 @@ ex_allowed_characters = base_allowed + "%<>=,"
 eq_allowed_characters = base_allowed + "=,"
 
 base_banned_words = (
-    'import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None')
+    'import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None', 'help', 'print', 'sys')
 
 
 def validate_input(input_str, allowed_characters, banned_words, char_check=None):
@@ -70,6 +73,27 @@ def validate_input(input_str, allowed_characters, banned_words, char_check=None)
     for word in findall(r'[A-Za-z_]+', input_str):
         if word in banned_words:
             raise MathRunError(f"Name: \"{word}\" Not Allowed In Expression")
+
+
+def process_coefficients(source_str: str, var_name: str):
+    parsed = source_str
+    pattern = re.compile(r'[0-9.]+?' + var_name + r'(\*{2}\d)?')
+    r = pattern.search(parsed)
+    while r is not None:
+        as_list = list(parsed)
+        as_list.insert(r.start(), '(')
+        as_list.insert(r.end() + 1, ')')
+        as_list.insert(r.start() + parsed[r.start():r.end()].index('x') + 1, '*')
+        parsed = ''.join(as_list)
+        r = pattern.search(parsed, r.end())
+    pattern = re.compile(r'\)[0-9(x]')
+    r = pattern.search(parsed)
+    while r is not None:
+        as_list = list(parsed)
+        as_list.insert(r.start() + 1, '*')
+        parsed = ''.join(as_list)
+        r = pattern.search(parsed, r.end())
+    return parsed
 
 
 def sanitize_input(input_str):
@@ -145,6 +169,6 @@ async def eq_validate(raw_expression, var_name):
 
 
 async def solve_equation(raw_expression, memory, var_name):
-    expression = sanitize_input(raw_expression)
+    expression = process_coefficients(sanitize_input(raw_expression), var_name)
     split_equation = expression.split("=")
     return calc_equation(split_equation[0], split_equation[1], memory, var_name)

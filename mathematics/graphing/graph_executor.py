@@ -1,5 +1,6 @@
 from mathematics.graphing.grapher import Grapher
-from mathematics.math_executor import validate_input, sanitize_input, base_banned_words, base_allowed, MathRunError
+from mathematics.math_executor import validate_input, sanitize_input, base_banned_words, base_allowed, MathRunError, \
+    process_coefficients
 
 
 class GraphError(Exception):
@@ -36,7 +37,7 @@ def process_formulas(formulas: list[str]):
     for index, formula in enumerate(formulas):
         try:
             validate_input(formula, base_allowed, base_banned_words)
-            sanitized_formula = sanitize_input(formula)
+            sanitized_formula = process_coefficients(sanitize_input(formula), 'x')
             output_funcs.append(get_formula_lambda(sanitized_formula))
         except GraphError as error:
             raise GraphError(f"Formula {index + 1}: {error.args[0]}")

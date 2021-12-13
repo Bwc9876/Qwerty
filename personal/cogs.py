@@ -29,8 +29,9 @@ class Personal(BaseCog, name="Personal"):
         if action == 'start':
             if self.projector_proc is not None:
                 await ctx.respond("Already Started")
-            self.projector_proc = await create_subprocess_shell(os.getenv("PROJ_EXEC"), stdout=PIPE, cwd=os.getenv("PROJ_WORK_DIR"))
-            await ctx.respond("Started")
+            else:
+                self.projector_proc = await create_subprocess_shell(os.getenv("PROJ_EXEC"), stdout=PIPE, cwd=os.getenv("PROJ_WORK_DIR"))
+                await ctx.respond("Started")
         else:
             if self.projector_proc is not None:
                 try:

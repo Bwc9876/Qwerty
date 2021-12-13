@@ -30,6 +30,7 @@ class Personal(BaseCog, name="Personal"):
             if self.projector_proc is not None:
                 await ctx.respond("Already Started")
             self.projector_proc = await create_subprocess_shell(os.getenv("PROJ_EXEC"), stdout=PIPE, cwd=os.getenv("PROJ_WORK_DIR"))
+            await ctx.respond("Started")
         else:
             if self.projector_proc is not None:
                 try:
@@ -37,6 +38,7 @@ class Personal(BaseCog, name="Personal"):
                 except ProcessLookupError:
                     pass
                 self.projector_proc = None
+                await ctx.respond("Stopped")
             else:
                 await ctx.respond("Not Running (At Least in Subprocess)")
 

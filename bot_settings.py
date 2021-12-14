@@ -19,5 +19,6 @@ AVAILABLE_COGS = {
     'mathematics.cogs': ('Math',),
     'personal.cogs': ('Personal',),
     'status.cogs': ('Status',),
+    'finance.cogs': ('Finance',),
     'minecraft.cogs': ('Minecraft',),
 }

@@ -17,11 +17,14 @@
 - ~~Status Cog (gets statuses of various services)~~
 - ~~Minecraft Cog~~
 
+# Today
+
+- Finance Cog
+
 # Later
 
 - `D&D` Cog
 - `Music` Cog? (yt would be hard to do)
-- `Finance` Cog (stocks, trade rates, etc.)
 - `Games` Cog (gambling, economy)
 - `Debug` Cog (dump info about data to chat (only to me and if `DEBUG=True`))
 - Web Interface

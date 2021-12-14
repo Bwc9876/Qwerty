@@ -8,7 +8,8 @@ INSTALLED_APPS = (
     'mathematics',
     'personal',
     'status',
-    'minecraft'
+    'minecraft',
+    'finance'
 )
 
 DATABASES = {

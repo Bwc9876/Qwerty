@@ -11,14 +11,15 @@
 - ~~Maybe Some More Console Stuff~~
 - ~~Cache Conversion Auto-Complete~~
 
-# Tomorrow
-- LaTeX Rendering For `/graph` (and also maybe a `/latex` command)
-- `Status` Cog (gets statuses of various services)
+# 12/14/21
+
+- ~~LaTeX Rendering For `/graph` (and also maybe a `/latex` command)~~
+- ~~Status Cog (gets statuses of various services)~~
+- ~~Minecraft Cog~~
 
 # Later
 
 - `D&D` Cog
-- `Minecraft` Cog? (Move to the `games` user on `aperture`), (maybe paper plugin to confirm identity)
 - `Music` Cog? (yt would be hard to do)
 - `Finance` Cog (stocks, trade rates, etc.)
 - `Games` Cog (gambling, economy)

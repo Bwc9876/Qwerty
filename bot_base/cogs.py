@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord.utils import basic_autocomplete
 
 import persistence
-from bot_settings import DEBUG_GUILDS
+from bot_settings import DEBUG_GUILDS, OWNER
 from .exceptions import ImproperlyConfiguredCogError, NoCogDataError
 from .models import BaseCogData
 
@@ -79,7 +79,7 @@ class BaseBot(commands.Cog, name="Base Bot"):
         await ctx.respond("blop")
 
     @slash_command(name="enable-cog", description="Enable A Cog For This Server", guild_ids=DEBUG_GUILDS)
-    @permissions.is_owner()
+    @permissions.is_user(OWNER)
     async def enable(self, ctx: ApplicationContext, cog_name: Option(str, description="The name of the cog to enable",
                                                                      autocomplete=basic_autocomplete(
                                                                          cog_autocomplete))):
@@ -90,7 +90,7 @@ class BaseBot(commands.Cog, name="Base Bot"):
             await ctx.respond(error.args[0], ephemeral=True)
 
     @slash_command(name="disable-cog", description="Disable A Cog For This Server", guild_ids=DEBUG_GUILDS)
-    @permissions.is_owner()
+    @permissions.is_user(OWNER)
     async def disable(self, ctx: ApplicationContext, cog_name: Option(str, description="The name of the cog to disable",
                                                                       autocomplete=basic_autocomplete(
                                                                           cog_autocomplete))):

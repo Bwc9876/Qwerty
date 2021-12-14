@@ -17,5 +17,7 @@ AVAILABLE_COGS = {
     'bot_base.cogs': ('BaseBot',),
     'moderation.cogs': ('Moderation',),
     'mathematics.cogs': ('Math',),
-    'personal.cogs': ('Personal',)
+    'personal.cogs': ('Personal',),
+    'status.cogs': ('Status',),
+    'minecraft.cogs': ('Minecraft',),
 }

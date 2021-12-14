@@ -6,7 +6,9 @@ INSTALLED_APPS = (
     'bot_base',
     'moderation',
     'mathematics',
-    'personal'
+    'personal',
+    'status',
+    'minecraft'
 )
 
 DATABASES = {

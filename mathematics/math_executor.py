@@ -1,6 +1,4 @@
 import re
-import os
-import sys
 import string
 from re import findall
 
@@ -59,7 +57,8 @@ ex_allowed_characters = base_allowed + "%<>=,"
 eq_allowed_characters = base_allowed + "=,"
 
 base_banned_words = (
-    'import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None', 'help', 'print', 'sys')
+    'import', 'exec', 'eval', 'subprocess', 'os', 'discord', 'bot', 'bot_settings', 'KEY', 'dj_settings', 'None',
+    'help', 'print', 'sys')
 
 
 def validate_input(input_str, allowed_characters, banned_words, char_check=None):

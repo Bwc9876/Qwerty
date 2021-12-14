@@ -1,5 +1,5 @@
 from bot_base.models import BaseCogData
 
 
-class PersonalCogData(BaseCogData):
+class StatusCogData(BaseCogData):
     pass

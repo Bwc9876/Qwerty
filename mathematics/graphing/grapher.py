@@ -22,7 +22,7 @@ class Grapher:
         'font': DEFAULT_FONT,
         'equations': [],
         'title': "",
-        'x_axis_label': "x",
+        'x_axis_label': r"x",
         'y_axis_label': "ƒ(x)",
         'origin_lines': {
             'color': "#00000050",

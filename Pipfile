@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+python-dotenv = "*"
+matplotlib = "*"
+mplfinance = "*"
+yfinance = "*"
+sympy = "*"
+mcstatus = "*"
+mctools = "*"
+favicon = "*"
+py-cord = {editable = true, ref = "c50d0b9c73b98c766998ce5a5574442e3afa2fe8", git = "https://github.com/Pycord-Development/pycord"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

@@ -7,6 +7,7 @@ from yfinance import Ticker
 
 from bot_base.cogs import BaseCog
 from bot_settings import DEBUG_GUILDS
+from finance.models import FinanceCogData
 
 periods = {
     '1 year': ('1y', '1wk'),
@@ -18,6 +19,8 @@ periods = {
 
 
 class Finance(BaseCog, name='Finance'):
+
+    cog_data_model = FinanceCogData
 
     @slash_command(name='stock', description='Get the information for a stock', guild_ids=DEBUG_GUILDS)
     async def stock(self, ctx: ApplicationContext,
@@ -36,7 +39,7 @@ class Finance(BaseCog, name='Finance'):
                  fill_between=dict(y1=data['Close'].values, y2=data['Low'].min(), color=between_color, alpha=0.2),
                  savefig=out_file)
             out_file.seek(0)
-            await ctx.respond(file=File(out_file))
+            await ctx.respond(file=File(out_file, filename='candlestick.png'))
             out_file.close()
         except ConnectionError:
             await ctx.send(f"Couldn't find stock information for \"{symbol}\"")

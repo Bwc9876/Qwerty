@@ -23,6 +23,7 @@
 
 # Today 
 - D&D Cog
+- Redo Option Names
 
 # Later
 

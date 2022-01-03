@@ -64,7 +64,7 @@ class Minecraft(BaseCog):
             if ctx.interaction.user.id == OWNER:
                 return True
             else:
-                await ctx.respond("This command cna only be used by the owner of this bot", ephemeral=True)
+                await ctx.respond("This command can only be used by the owner of this bot", ephemeral=True)
                 return False
         elif cmd_name in self.COMMAND_PERMS[1]:
             if ctx.interaction.user.id == OWNER or (data.controller_role is not None and ctx.interaction.user.get_role(

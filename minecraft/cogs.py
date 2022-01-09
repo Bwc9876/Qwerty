@@ -163,13 +163,16 @@ class Minecraft(BaseCog):
             embed.add_field(name="Version", value=stats.version.name, inline=False)
             embed.add_field(name="Ping", value=str(stats.latency) + " ms", inline=False)
             embed.add_field(name="Players", value=f"{stats.players.online} out of {stats.players.max}", inline=False)
-            favicon_file = BytesIO()
-            decoded = base64.decodebytes(stats.favicon[22:].encode('utf-8'))
-            favicon_file.write(decoded)
-            favicon_file.seek(0)
-            embed.set_thumbnail(url="attachment://server_icon.png")
-            await ctx.respond(file=File(favicon_file, filename="server_icon.png"), embed=embed)
-            favicon_file.close()
+            if stats.favicon is None:
+                await ctx.respond(embed=embed)
+            else:
+                favicon_file = BytesIO()
+                decoded = base64.decodebytes(stats.favicon[22:].encode('utf-8'))
+                favicon_file.write(decoded)
+                favicon_file.seek(0)
+                embed.set_thumbnail(url="attachment://server_icon.png")
+                await ctx.respond(file=File(favicon_file, filename="server_icon.png"), embed=embed)
+                favicon_file.close()
         except (ConnectionError, SocketError):
             embed.description = f"Server is offline, run `/mc-start` to start it"
             embed.add_field(name="Profile", value=data.active_profile)

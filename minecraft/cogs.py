@@ -21,7 +21,7 @@ from bot_settings import DEBUG_GUILDS, OWNER
 from minecraft.models import MinecraftCogData
 
 MC_ROOT = os.getenv('MC_ROOT', './')
-
+INCLUDE_STDOUT = os.getenv('MC_STDOUT', "False")
 
 async def new_profile_autocomplete(ctx: AutocompleteContext):
     return [profile_dir.name for profile_dir in Path(MC_ROOT).iterdir() if profile_dir.is_dir()]
@@ -106,7 +106,11 @@ class Minecraft(BaseCog):
         if self.server_is_online():
             await ctx.respond("The server is already online", ephemeral=True)
         else:
-            self.server_proc = await create_subprocess_shell(self.mc_start_cmd, stdout=PIPE,
+            if INCLUDE_STDOUT == "True":
+                self.server_proc = await create_subprocess_shell(self.mc_start_cmd,
+                                                             cwd=f'{MC_ROOT}/{data.active_profile}')
+            else:
+                self.server_proc = await create_subprocess_shell(self.mc_start_cmd, stdout=PIPE,
                                                              cwd=f'{MC_ROOT}/{data.active_profile}')
             await ctx.respond(f"Server Started With Profile `{data.active_profile}`")
 
